@@ -1,0 +1,65 @@
+import './App.css'
+import {Route, Switch} from 'react-router-dom'
+import Login from './components/Login'
+import Home from './components/Home'
+import Jobs from './components/Jobs'
+import Jobdetails from './components/Jobdetails'
+
+const employmentTypesList = [
+  {
+    label: 'Full Time',
+    employmentTypeId: 'FULLTIME',
+  },
+  {
+    label: 'Part Time',
+    employmentTypeId: 'PARTTIME',
+  },
+  {
+    label: 'Freelance',
+    employmentTypeId: 'FREELANCE',
+  },
+  {
+    label: 'Internship',
+    employmentTypeId: 'INTERNSHIP',
+  },
+]
+
+const salaryRangesList = [
+  {
+    salaryRangeId: '1000000',
+    label: '10 LPA and above',
+  },
+  {
+    salaryRangeId: '2000000',
+    label: '20 LPA and above',
+  },
+  {
+    salaryRangeId: '3000000',
+    label: '30 LPA and above',
+  },
+  {
+    salaryRangeId: '4000000',
+    label: '40 LPA and above',
+  },
+]
+
+// Replace your code here
+const App = () => (
+  <Switch>
+    <Route exact path="/login" component={Login} />
+    <Route exact path="/" component={Home} />
+    <Route
+      exact
+      path="/jobs"
+      component={() => (
+        <Jobs
+          employmentTypesList={employmentTypesList}
+          salaryRangesListItem={salaryRangesList}
+        />
+      )}
+    />
+    <Route exact path="/jobs/:id" component={Jobdetails} />
+  </Switch>
+)
+
+export default App
