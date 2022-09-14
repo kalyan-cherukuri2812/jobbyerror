@@ -4,6 +4,7 @@ import Login from './components/Login'
 import Home from './components/Home'
 import Jobs from './components/Jobs'
 import Jobdetails from './components/Jobdetails'
+import NotFound from './components/NotFound'
 
 const employmentTypesList = [
   {
@@ -59,6 +60,7 @@ const App = () => (
       )}
     />
     <Route exact path="/jobs/:id" component={Jobdetails} />
+    <Route component={NotFound} />
   </Switch>
 )
 

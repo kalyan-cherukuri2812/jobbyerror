@@ -6,7 +6,7 @@ import Cookie from 'js-cookie'
 import Header from '../Header'
 
 const Home = () => {
-  if (Cookie.get('jwtToken') === undefined) {
+  if (Cookie.get('jwt_token') === undefined) {
     return <Redirect to="/login" />
   }
   return (

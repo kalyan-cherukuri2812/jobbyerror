@@ -1,0 +1,14 @@
+.not-found-bg {
+  background-color: black;
+  min-height: 100vh;
+  background-size: cover;
+}
+.not-found-div {
+  color: white;
+
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

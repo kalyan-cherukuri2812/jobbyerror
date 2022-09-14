@@ -7,17 +7,20 @@ import Cookie from 'js-cookie'
 
 const Header = props => {
   const logoutClick = () => {
-    Cookie.remove('jwtToken')
+    Cookie.remove('jwt_token')
     const {history} = props
     history.replace('/login')
   }
   return (
     <div className="header-bg-card">
-      <img
-        className="header-logo-sm"
-        src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
-        alt="website logo"
-      />
+      <Link to="/">
+        <img
+          className="header-logo-sm"
+          src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
+          alt="website logo"
+        />
+      </Link>
+
       <div className="header-icons-div">
         <Link to="/">
           <AiFillHome className="header-icon" />

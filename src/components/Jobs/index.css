@@ -68,6 +68,7 @@
   padding: 10px;
   padding-left: 20px;
   padding-right: 20px;
+  margin: 70px;
 }
 .type-of-employment-div {
   width: 100%;
@@ -76,9 +77,13 @@
   align-items: flex-start;
 }
 .checkbox-div {
+  list-style-type: none;
   display: flex;
   align-items: center;
   margin-bottom: 18px;
+}
+ul {
+  padding: 0px;
 }
 .checkbox {
   width: 15px;
@@ -171,13 +176,29 @@
   color: white;
   font-family: roboto;
   font-size: 15px;
+  margin-bottom: 30px;
 }
 .jobs-search-div-lg {
   display: none;
 }
 
+.no-jobs-div {
+  width: 100%;
+  padding: 30px;
+  color: white;
+  font-family: roboto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.no-jobs-img {
+  width: 100%;
+}
 @media screen and (min-width: 768px) {
   .jobs-card {
+    padding-left: 10%;
+    padding-right: 10%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

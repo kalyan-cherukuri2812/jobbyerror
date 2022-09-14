@@ -29,7 +29,7 @@ export default class Login extends Component {
     console.log(respData)
     if (response.ok === true) {
       this.setState({errorMsg: ''})
-      Cookie.set('jwtToken', respData.jwt_token, {expires: 30})
+      Cookie.set('jwt_token', respData.jwt_token, {expires: 30})
       const {history} = this.props
       history.replace('/')
     } else {
@@ -39,7 +39,7 @@ export default class Login extends Component {
 
   render() {
     const {username, password, errorMsg} = this.state
-    if (Cookie.get('jwtToken') !== undefined) {
+    if (Cookie.get('jwt_token') !== undefined) {
       return <Redirect to="/" />
     }
 

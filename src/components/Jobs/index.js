@@ -14,6 +14,7 @@ class Jobs extends Component {
     search: '',
     profilData: {},
     profilFailerView: false,
+    jobsFailerView: false,
     jobsDataList: [],
     loader: '',
     salaryRange: '',
@@ -28,18 +29,27 @@ class Jobs extends Component {
         prev => ({
           employType: [...new Set([...prev.employType, event.target.id])],
         }),
-        this.getData,
+        this.getJobsData,
+        this.getProfileData,
       )
     } else {
       const updatedemployType = employType.filter(
         each => each !== event.target.id,
       )
-      this.setState({employType: updatedemployType}, this.getData)
+      this.setState(
+        {employType: updatedemployType},
+        this.getJobsData,
+        this.getProfileData,
+      )
     }
   }
 
   salaryChange = event => {
-    this.setState({salaryRange: event.target.id}, this.getData)
+    this.setState(
+      {salaryRange: event.target.id},
+      this.getJobsData,
+      this.getProfileData,
+    )
   }
 
   searchChange = event => {
@@ -47,13 +57,16 @@ class Jobs extends Component {
   }
 
   componentDidMount = () => {
-    this.getData()
+    this.getJobsData()
+    this.getProfileData()
   }
 
-  getData = async () => {
-    const cookiesData = Cookie.get('jwtToken')
+  getJobsData = async () => {
+    const cookiesData = Cookie.get('jwt_token')
     this.setState({loader: true})
     const {salaryRange, employType} = this.state
+    console.log(employType)
+    console.log(salaryRange)
     const url = `https://apis.ccbp.in/jobs?employment_type=${employType}&minimum_package=${salaryRange}&search=`
     const options = {
       method: 'GET',
@@ -76,21 +89,34 @@ class Jobs extends Component {
         title: each.title,
       }))
 
-      this.setState({jobsDataList: camCaseData, loader: false})
+      this.setState({
+        jobsDataList: camCaseData,
+        loader: false,
+        jobsFailerView: false,
+      })
+    } else {
+      this.setState({jobsFailerView: true})
+    }
+  }
+
+  getProfileData = async () => {
+    const cookiesData = Cookie.get('jwt_token')
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${cookiesData}`,
+      },
     }
     const profilResponse = await fetch(' https://apis.ccbp.in/profile', options)
     const profilRespData = await profilResponse.json()
 
     if (profilResponse.ok) {
-      let camCaseProfilData = profilRespData.profile_details
-
-      camCaseProfilData = {
-        profileImageUrl: camCaseProfilData.profile_image_url,
-        name: camCaseProfilData.name,
-        shortBio: camCaseProfilData.short_bio,
+      const camCaseProfilData = {
+        profileImageUrl: profilRespData.profile_details.profile_image_url,
+        name: profilRespData.profile_details.name,
+        shortBio: profilRespData.profile_details.short_bio,
       }
-      this.setState({profilData: camCaseProfilData})
-      this.setState({profilFailerView: false})
+      this.setState({profilData: camCaseProfilData, profilFailerView: false})
     } else {
       this.setState({profilFailerView: true})
     }
@@ -101,6 +127,7 @@ class Jobs extends Component {
       search,
       profilData,
       profilFailerView,
+      jobsFailerView,
       jobsDataList,
       loader,
       salaryRange,
@@ -112,7 +139,7 @@ class Jobs extends Component {
     )
     const {salaryRangesListItem, employmentTypesList} = this.props
 
-    if (Cookie.get('jwtToken') === undefined) {
+    if (Cookie.get('jwt_token') === undefined) {
       return <Redirect to="/login" />
     }
     return (
@@ -128,16 +155,21 @@ class Jobs extends Component {
                 type="search"
                 placeholder="Search"
               />
+
               <BsSearch className="search-icon" />
             </div>
 
-            {profilFailerView === true ? (
-              <button className="profil-retry-btn" type="button">
+            {profilFailerView ? (
+              <button
+                onClick={this.getProfileData}
+                className="profil-retry-btn"
+                type="button"
+              >
                 Retry
               </button>
             ) : (
               <div className="profil-card">
-                <img src={profilData.profileImageUrl} alt="profil" />
+                <img src={profilData.profileImageUrl} alt="profile" />
                 <h1 className="profil-name">{profilData.name}</h1>
                 <p>{profilData.shortBio} </p>
               </div>
@@ -146,42 +178,49 @@ class Jobs extends Component {
 
             <div className="type-of-employment-div">
               <h3 className="typ-of-emp-p">Type of Employment</h3>
-              {employmentTypesList.map(each => (
-                <div key={each.employmentTypeId} className="checkbox-div">
-                  <input
-                    className="checkbox"
-                    type="checkbox"
-                    value={employType}
-                    onChange={this.employChange}
-                    id={each.employmentTypeId}
-                  />
-                  <label
-                    htmlFor={each.employmentTypeId}
-                    className="typ-of-emp-p"
-                  >
-                    {each.label}
-                  </label>
-                </div>
-              ))}
+              <ul>
+                {employmentTypesList.map(each => (
+                  <li key={each.employmentTypeId} className="checkbox-div">
+                    <input
+                      className="checkbox"
+                      type="checkbox"
+                      value={employType}
+                      onChange={this.employChange}
+                      id={each.employmentTypeId}
+                    />
+                    <label
+                      htmlFor={each.employmentTypeId}
+                      className="typ-of-emp-p"
+                    >
+                      {each.label}
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </div>
             <hr className="hr" />
             <div className="type-of-employment-div">
               <h3 className="typ-of-emp-p">Salary Range</h3>
-              {salaryRangesListItem.map(each => (
-                <div key={each.salaryRangeId} className="checkbox-div">
-                  <input
-                    className="checkbox"
-                    value={salaryRange}
-                    onChange={this.salaryChange}
-                    type="radio"
-                    name="salary"
-                    id={each.salaryRangeId}
-                  />
-                  <label className="typ-of-emp-p" htmlFor={each.salaryRangeId}>
-                    {each.label}
-                  </label>
-                </div>
-              ))}
+              <ul>
+                {salaryRangesListItem.map(each => (
+                  <li key={each.salaryRangeId} className="checkbox-div">
+                    <input
+                      className="checkbox"
+                      value={salaryRange}
+                      onChange={this.salaryChange}
+                      type="radio"
+                      name="salary"
+                      id={each.salaryRangeId}
+                    />
+                    <label
+                      className="typ-of-emp-p"
+                      htmlFor={each.salaryRangeId}
+                    >
+                      {each.label}
+                    </label>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
@@ -194,8 +233,10 @@ class Jobs extends Component {
                 type="search"
                 placeholder="Search"
               />
+
               <BsSearch className="search-icon" />
             </div>
+
             {loader === true ? (
               <div className="loader-container">
                 <Loader
@@ -206,7 +247,7 @@ class Jobs extends Component {
                 />
               </div>
             ) : (
-              <>
+              <ul>
                 {searchResult.map(each => (
                   <Link key={each.id} className="link" to={`/jobs/${each.id}`}>
                     <li className="j-d-li">
@@ -214,7 +255,7 @@ class Jobs extends Component {
                         <img
                           className="comp-img"
                           src={each.companyLogoUrl}
-                          alt="img"
+                          alt="company logo"
                         />
                         <div className="name-rating-card">
                           <h1 className="comp-name-h">{each.title}</h1>
@@ -246,8 +287,38 @@ class Jobs extends Component {
                     </li>
                   </Link>
                 ))}
-              </>
+              </ul>
             )}
+
+            {searchResult.length === 0 && loader === false ? (
+              <div className="no-jobs-div">
+                <img
+                  className="no-jobs-img"
+                  src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+                  alt="no job"
+                />
+                <h1>No Jobs Found</h1>
+                <p>We could not find any jobs. Try other filters</p>
+              </div>
+            ) : null}
+            {jobsFailerView ? (
+              <div className="no-jobs-div">
+                <img
+                  className="no-jobs-img"
+                  src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+                  alt="failure view"
+                />
+                <h2>Oops! Something Went Wrong</h2>
+                <p>We cannot seem to find the page you are looking for.</p>
+                <button
+                  onClick={this.getJobsData}
+                  className="profil-retry-btn"
+                  type="button"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
